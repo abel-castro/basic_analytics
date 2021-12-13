@@ -1,0 +1,8 @@
+-r ./base.txt
+
+pytest==6.2.5
+pytest-django==4.3.0
+black
+isort
+freezegun
+pytest-freezegun

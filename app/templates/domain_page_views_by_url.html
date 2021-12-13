@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block main_content %}
+{% include "includes/page_title.html" %}
+
+<ul class="list-group">
+{% for entry in data %}
+    <li class="list-group-item d-flex justify-content-between align-items-center">
+        {{ entry.url }}
+          <span class="badge bg-primary rounded-pill">{{ entry.count }}</span>
+    </li>
+{% endfor %}
+</ul>
+
+{% endblock %}

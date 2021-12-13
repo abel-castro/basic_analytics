@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block main_content %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+{% include "includes/page_title.html" %}
+
+<canvas id="line-chart" width="800" height="450"></canvas>
+
+<script>
+new Chart(document.getElementById("line-chart"), {
+  type: 'line',
+  data: {
+    labels: {{ months | safe }},
+    datasets: [
+        {
+        label: "Page views",
+        data: {{ data }},
+        borderColor: "#3e95cd",
+        fill: false
+        }
+    ]
+  },
+  options: {
+    responsive: true,
+    legend: {
+        display: false
+    },
+    scales: {
+        xAxes: [{
+            type: 'time',
+            time: {
+                displayFormats: {
+                    'day': 'YYYY-MM'
+                },
+                unit: 'month',
+            }
+        }]
+    }
+  }
+});
+</script>
+{% endblock %}

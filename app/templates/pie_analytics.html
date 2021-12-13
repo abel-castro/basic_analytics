@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block main_content %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+{% include "includes/page_title.html" %}
+
+<canvas id="doughnut-chart" width="800" height="450"></canvas>
+
+<script>
+new Chart(document.getElementById("doughnut-chart"), {
+  type: 'doughnut',
+  data: {
+    labels: {{ labels | safe }},
+    datasets: [
+        {
+        data: {{ data }},
+        backgroundColor: {{ colors | safe }},
+        hoverOffset: 4
+        }
+    ]
+  },
+  options: {
+      responsive: true,
+  }
+});
+</script>
+{% endblock %}

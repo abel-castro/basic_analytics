@@ -1,0 +1,10 @@
+*.pyc
+*.swp
+.idea
+.env
+.DS_Store
+.pytest_cache
+
+staticfiles
+GeoLite2-City.mmdb
+GeoLite2-Country.mmdb

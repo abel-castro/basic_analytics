@@ -1,0 +1,12 @@
+django==3.*
+psycopg2==2.8.6
+environs==9.3.1 # https://pypi.org/project/environs/#basic-usage
+django-extensions==3.1.1
+Werkzeug==1.0.1 # required for django-extensions
+djangorestframework==3.12.4
+pyyaml==6.0
+ua-parser==0.10.0
+user-agents==2.2.0
+django-user-agents==0.4.0
+geoip2==4.5.0
+factory_boy==3.2.1

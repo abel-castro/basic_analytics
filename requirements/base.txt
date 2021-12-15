@@ -10,3 +10,4 @@ user-agents==2.2.0
 django-user-agents==0.4.0
 geoip2==4.5.0
 factory_boy==3.2.1
+django-axes==5.13.1

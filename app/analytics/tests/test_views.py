@@ -104,3 +104,10 @@ def test_n_plus_1(client, django_assert_max_num_queries):
     with django_assert_max_num_queries(10):
         response = client.get(reverse("domain_page_views", kwargs={"pk": test_domain.pk}))
         assert response.status_code == status.HTTP_200_OK
+
+
+@pytest.mark.django_db
+def test_no_redirect_to_login_page(client):
+    response = client.get(reverse("home_view"))
+    assert response.status_code == status.HTTP_403_FORBIDDEN
+

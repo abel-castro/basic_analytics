@@ -1,5 +1,7 @@
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import AccessMixin
 from django.views.generic import DetailView, ListView
+from django.core.exceptions import PermissionDenied
+
 from django.views.generic.base import ContextMixin
 from rest_framework import status
 from rest_framework.response import Response
@@ -9,7 +11,18 @@ from analytics.managers import PageViewCreationError
 from analytics.models import Domain, PageView
 
 
-class DashboardPageMixin(LoginRequiredMixin, ContextMixin):
+class CustomLoginRequiredMixin(AccessMixin):
+    """
+    django.contrib.auth.mixins.LoginRequiredMixin redirects to the login page but as we
+    want to hide the login url we return an 403 instead.
+    """
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated or not request.user.is_superuser:
+            raise PermissionDenied
+        return super().dispatch(request, *args, **kwargs)
+
+
+class DashboardPageMixin(CustomLoginRequiredMixin, ContextMixin):
     page_title = ""
 
     def get_page_title(self) -> str:

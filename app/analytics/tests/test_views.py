@@ -6,7 +6,6 @@ from rest_framework import status
 from analytics.models import Domain, PageView
 from analytics.tests.factories import DomainFactory, PageViewFactory
 
-
 TEST_REQUEST_META = {
     "wsgi.url_scheme": "http",
     "PATH_INFO": "/about-me/",
@@ -91,7 +90,7 @@ class TestAddPageView:
 
 
 @pytest.mark.django_db
-def test_n_plus_1(client, django_assert_max_num_queries):
+def test_n_plus_1__chart_page(client, django_assert_max_num_queries):
     PageViewFactory.create_batch(10)
     test_domain = Domain.objects.first()
     superuser = User.objects.create_user(
@@ -109,6 +108,24 @@ def test_n_plus_1(client, django_assert_max_num_queries):
         response = client.get(
             reverse("domain_page_views", kwargs={"pk": test_domain.pk})
         )
+        assert response.status_code == status.HTTP_200_OK
+
+
+@pytest.mark.django_db
+def test_n_plus_1__home_page(client, django_assert_max_num_queries):
+    PageViewFactory.create_batch(1)
+    superuser = User.objects.create_user(
+        username="superuser", password="Qwert1234", is_superuser=True
+    )
+    client.force_login(superuser)
+    with django_assert_max_num_queries(11):
+        response = client.get(reverse("home_view"))
+        assert response.status_code == status.HTTP_200_OK
+
+    # todo improve this n+1 effect
+    PageViewFactory.create_batch(1)
+    with django_assert_max_num_queries(15):
+        response = client.get(reverse("home_view"))
         assert response.status_code == status.HTTP_200_OK
 
 

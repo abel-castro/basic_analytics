@@ -6,6 +6,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+import settings
 from analytics.managers import PageViewCreationError
 from analytics.models import Domain, PageView
 
@@ -42,6 +43,7 @@ class DashboardPageMixin(CustomLoginRequiredMixin, ContextMixin):
         context["page_title"] = self.get_page_title()
         context["is_robots_page"] = not self.get_no_robots_value()
         context["domains"] = Domain.objects.only("id", "base_url")
+        context["django_admin_url"] = settings.ADMIN_URL
         return context
 
 
@@ -70,6 +72,13 @@ class HomeView(DashboardPageMixin, ListView):
 
     def get_page_title(self) -> str:
         return "Dashboard"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context[
+            "domain_monthly_average_views"
+        ] = Domain.objects.get_monthly_average_page_views()
+        return context
 
 
 class DomainPageViews(DashboardPageMixin, DetailView):

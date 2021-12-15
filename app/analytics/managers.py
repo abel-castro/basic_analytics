@@ -13,6 +13,19 @@ class PageViewCreationError(Exception):
     """
 
 
+class DomainManager(models.Manager):
+    def get_monthly_average_page_views(self) -> list:
+        monthly_average_page_views = []
+        for domain in self.model.objects.all().prefetch_related("page_views"):
+            data = {
+                "domain": domain.base_url,
+                "with_robots": domain.get_monthly_average_page_views(),
+                "no_robots": domain.get_monthly_average_page_views(no_robots=True),
+            }
+            monthly_average_page_views.append(data)
+        return monthly_average_page_views
+
+
 class PageViewManager(models.Manager):
     def without_robots(self):
         """

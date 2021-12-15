@@ -5,18 +5,28 @@ from django.db.models import Count, F, Func, QuerySet, Value
 from django.db.models.functions import TruncMonth
 from factory.faker import faker
 
-from analytics.managers import PageViewManager
+from analytics.managers import DomainManager, PageViewManager
 
 
 class Domain(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     base_url = models.URLField()
 
+    objects = DomainManager()
+
     def __str__(self):
         return self.base_url
 
     def get_page_views(self, no_robots: bool = False) -> QuerySet:
         return self.page_views.without_robots() if no_robots else self.page_views
+
+    def get_monthly_average_page_views(self, no_robots: bool = False) -> float:
+        page_views = self.get_page_views_data(no_robots)["data"]
+        try:
+            value = round(sum(page_views) / len(page_views), 2)
+        except ZeroDivisionError:
+            value = 0
+        return value
 
     def get_page_views_data(self, no_robots: bool = False) -> dict:
         page_views = self.get_page_views(no_robots)

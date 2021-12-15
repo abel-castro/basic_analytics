@@ -96,6 +96,9 @@ class TestAnalytics(TestCase):
         assert expected_countries == device_analytics["labels"]
         assert expected_data == device_analytics["data"]
 
+    def test__get_monthly_average_views(self):
+        assert self.test_domain.get_monthly_average_page_views() == 13
+
 
 class TestNoRobotsAnalytics:
     pytestmark = pytest.mark.django_db
@@ -125,3 +128,32 @@ class TestNoRobotsAnalytics:
         PageViewFactory.create_batch(10, domain=domain, metadata=robot_metadata)
         PageViewFactory.create_batch(10, domain=domain)
         assert domain.get_page_views_data(no_robots=True)["data"] == [10]
+
+
+@pytest.mark.django_db
+def test_get_monthly_average_views():
+    domain = DomainFactory.create()
+    robot_metadata = {
+        "browser": "Other",
+        "os": "Other",
+        "device": settings.ROBOT_DEVICES[0],
+        "country": "Unknown",
+    }
+    PageViewFactory.create_batch(20, domain=domain, metadata=robot_metadata)
+    PageViewFactory.create_batch(10, domain=domain)
+    assert domain.get_monthly_average_page_views() == 30
+    assert domain.get_monthly_average_page_views(no_robots=True) == 10
+
+
+@pytest.mark.django_db
+def test__domain_manager__get_monthly_average_page_views():
+    domain = DomainFactory.create()
+    PageViewFactory.create_batch(10, domain=domain)
+    expected_data = [
+        {
+            "domain": domain.base_url,
+            "with_robots": 10,
+            "no_robots": 10,
+        }
+    ]
+    assert Domain.objects.get_monthly_average_page_views() == expected_data

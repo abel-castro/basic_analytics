@@ -5,11 +5,15 @@
 
 {% include "includes/page_title.html" %}
 
-<canvas id="doughnut-chart" width="800" height="450"></canvas>
+<div class="row d-flex justify-content-center flex-nowrap">
+    <div class="pie-chart-container">
+        <canvas id="pie-chart" width="800" height="450"></canvas>
+    </div>
+</div>
 
 <script>
-new Chart(document.getElementById("doughnut-chart"), {
-  type: 'doughnut',
+new Chart(document.getElementById("pie-chart"), {
+  type: 'pie',
   data: {
     labels: {{ labels | safe }},
     datasets: [

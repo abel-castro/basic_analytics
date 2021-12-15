@@ -26,7 +26,7 @@ from analytics.views import (DomainBrowserAnalytics, DomainCountryAnalytics,
 
 urlpatterns = [
     path(f"{settings.ADMIN_URL}/", admin.site.urls),
-    path("", HomeView.as_view(), name="home_view"),
+    path("", cache_page(60 * 60)(HomeView.as_view()), name="home_view"),
     path(
         "domain/<pk>/page-views",
         cache_page(60 * 60)(DomainPageViews.as_view()),

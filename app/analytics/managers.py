@@ -1,11 +1,10 @@
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 from rest_framework.request import Request
 
-from analytics.helpers import (
-    get_client_ip_from_request_meta,
-    get_page_view_metadata_from_request_meta,
-)
+from analytics.helpers import (get_client_ip_from_request_meta,
+                               get_page_view_metadata_from_request_meta)
 
 
 class PageViewCreationError(Exception):
@@ -15,6 +14,16 @@ class PageViewCreationError(Exception):
 
 
 class PageViewManager(models.Manager):
+    def without_robots(self):
+        """
+        Exclude robot generated page views from the queryset.
+        """
+        return (
+            self.get_queryset()
+            .exclude(metadata__device__in=settings.ROBOT_DEVICES)
+            .exclude(metadata__browser__in=settings.ROBOT_BROWSERS)
+        )
+
     def create_from_request(self, request: Request):
         from analytics.models import Domain
 

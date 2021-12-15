@@ -1,7 +1,6 @@
 from django.contrib.auth.mixins import AccessMixin
-from django.views.generic import DetailView, ListView
 from django.core.exceptions import PermissionDenied
-
+from django.views.generic import DetailView, ListView
 from django.views.generic.base import ContextMixin
 from rest_framework import status
 from rest_framework.response import Response
@@ -16,6 +15,7 @@ class CustomLoginRequiredMixin(AccessMixin):
     django.contrib.auth.mixins.LoginRequiredMixin redirects to the login page but as we
     want to hide the login url we return an 403 instead.
     """
+
     def dispatch(self, request, *args, **kwargs):
         if not request.user.is_authenticated or not request.user.is_superuser:
             raise PermissionDenied
@@ -25,12 +25,22 @@ class CustomLoginRequiredMixin(AccessMixin):
 class DashboardPageMixin(CustomLoginRequiredMixin, ContextMixin):
     page_title = ""
 
+    def get_no_robots_value(self) -> bool:
+        """
+        Return if robots data should be displayed or not.
+
+        This will be defined by passing the query parameter '?no_robots=true'
+        Only if '?no_robots=true' no robot data will be returned.
+        """
+        return self.request.GET.get("no_robots") == "true"
+
     def get_page_title(self) -> str:
         return f"{self.page_title} for {self.get_object()}"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["page_title"] = self.get_page_title()
+        context["is_robots_page"] = not self.get_no_robots_value()
         context["domains"] = Domain.objects.only("id", "base_url")
         return context
 
@@ -42,7 +52,9 @@ class PieAnalyticsMixin(DashboardPageMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        analytics = getattr(self.get_object(), self.get_data_function)()
+        analytics = getattr(self.get_object(), self.get_data_function)(
+            self.get_no_robots_value()
+        )
         context["colors"] = analytics["colors"]
         context["labels"] = analytics["labels"]
         context["data"] = analytics["data"]
@@ -52,6 +64,9 @@ class PieAnalyticsMixin(DashboardPageMixin, DetailView):
 class HomeView(DashboardPageMixin, ListView):
     template_name = "home.html"
     model = Domain
+
+    def get_no_robots_value(self) -> bool:
+        return True
 
     def get_page_title(self) -> str:
         return "Dashboard"
@@ -64,7 +79,7 @@ class DomainPageViews(DashboardPageMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        page_views = self.get_object().get_page_views()
+        page_views = self.get_object().get_page_views_data(self.get_no_robots_value())
         context["data"] = page_views["data"]
         context["months"] = page_views["months"]
         return context
@@ -77,7 +92,9 @@ class DomainPageViewsByUrl(DashboardPageMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        page_views_by_url = self.get_object().get_page_views_by_url()
+        page_views_by_url = self.get_object().get_page_views_by_url(
+            self.get_no_robots_value()
+        )
         context["data"] = page_views_by_url
         return context
 

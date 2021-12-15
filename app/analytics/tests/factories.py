@@ -18,6 +18,17 @@ TEST_URI_PATHS = [
     "/my-third-post",
 ]
 
+TEST_BROWSERS = ["Mobile Safari", "Chrome", "UptimeRobot"]
+
+TEST_DEVICES = ["Mac", "iPhone", "Spider"]
+
+TEST_METADATA = {
+    "browser": "Mobile Safari",
+    "os": "iOS",
+    "device": "iPhone",
+    "country": "AT",
+}
+
 
 class PageViewFactory(factory.django.DjangoModelFactory):
     class Meta:
@@ -33,9 +44,4 @@ class PageViewFactory(factory.django.DjangoModelFactory):
 
     @factory.lazy_attribute
     def metadata(self):
-        return {
-            "browser": "Mobile Safari",
-            "os": "iOS",
-            "device": "iPhone",
-            "country": "AT",
-        }
+        return TEST_METADATA

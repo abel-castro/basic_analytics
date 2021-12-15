@@ -19,47 +19,41 @@ from django.contrib import admin
 from django.urls import path
 from django.views.decorators.cache import cache_page
 
-from analytics.views import (
-    TrackView,
-    DomainBrowserAnalytics,
-    DomainCountryAnalytics,
-    DomainDeviceAnalytics,
-    DomainOSAnalytics,
-    DomainPageViews,
-    DomainPageViewsByUrl,
-    HomeView,
-)
+from analytics.views import (DomainBrowserAnalytics, DomainCountryAnalytics,
+                             DomainDeviceAnalytics, DomainOSAnalytics,
+                             DomainPageViews, DomainPageViewsByUrl, HomeView,
+                             TrackView)
 
 urlpatterns = [
     path(f"{settings.ADMIN_URL}/", admin.site.urls),
     path("", HomeView.as_view(), name="home_view"),
     path(
-        "domain/<pk>/page-views/",
+        "domain/<pk>/page-views",
         cache_page(60 * 60)(DomainPageViews.as_view()),
         name="domain_page_views",
     ),
     path(
-        "domain/<pk>/page-views-by-url/",
+        "domain/<pk>/page-views-by-url",
         cache_page(60 * 60)(DomainPageViewsByUrl.as_view()),
         name="domain_page_views_by_url",
     ),
     path(
-        "domain/<pk>/browser-analytics/",
+        "domain/<pk>/browser-analytics",
         cache_page(60 * 60)(DomainBrowserAnalytics.as_view()),
         name="domain_browser_analytics",
     ),
     path(
-        "domain/<pk>/country-analytics/",
+        "domain/<pk>/country-analytics",
         cache_page(60 * 60)(DomainCountryAnalytics.as_view()),
         name="domain_country_analytics",
     ),
     path(
-        "domain/<pk>/device-analytics/",
+        "domain/<pk>/device-analytics",
         cache_page(60 * 60)(DomainDeviceAnalytics.as_view()),
         name="domain_device_analytics",
     ),
     path(
-        "domain/<pk>/os-analytics/",
+        "domain/<pk>/os-analytics",
         cache_page(60 * 60)(DomainOSAnalytics.as_view()),
         name="domain_os_analytics",
     ),

@@ -1,7 +1,7 @@
 import uuid
 
 from django.db import models
-from django.db.models import Count, F, Func, Value
+from django.db.models import Count, F, Func, QuerySet, Value
 from django.db.models.functions import TruncMonth
 from factory.faker import faker
 
@@ -15,9 +15,13 @@ class Domain(models.Model):
     def __str__(self):
         return self.base_url
 
-    def get_page_views(self):
+    def get_page_views(self, no_robots: bool = False) -> QuerySet:
+        return self.page_views.without_robots() if no_robots else self.page_views
+
+    def get_page_views_data(self, no_robots: bool = False) -> dict:
+        page_views = self.get_page_views(no_robots)
         qs = (
-            self.page_views.annotate(evaluation_month=TruncMonth("timestamp"))
+            page_views.annotate(evaluation_month=TruncMonth("timestamp"))
             .values("evaluation_month")
             .annotate(Count("pk", distinct=True))
         ).order_by("evaluation_month")
@@ -33,9 +37,10 @@ class Domain(models.Model):
         data = list(qs.values_list("pk__count", flat=True))
         return {"data": data, "months": months}
 
-    def get_page_views_by_url(self):
+    def get_page_views_by_url(self, no_robots: bool = False) -> QuerySet:
+        page_views = self.get_page_views(no_robots)
         return (
-            self.page_views.values("url")
+            page_views.values("url")
             .annotate(count=Count("pk", distinct=True))
             .order_by("-count")
         )
@@ -57,9 +62,10 @@ class Domain(models.Model):
 
         return colors
 
-    def get_browser_analytics(self):
+    def get_browser_analytics(self, no_robots: bool = False) -> dict:
+        page_views = self.get_page_views(no_robots)
         qs = (
-            self.page_views.values("metadata__browser")
+            page_views.values("metadata__browser")
             .annotate(browser_count=Count("metadata__browser"))
             .order_by()
         )
@@ -69,9 +75,10 @@ class Domain(models.Model):
         data = self.get_data_in_percentages(data)
         return {"data": data, "colors": colors, "labels": labels}
 
-    def get_country_analytics(self):
+    def get_country_analytics(self, no_robots: bool = False) -> dict:
+        page_views = self.get_page_views(no_robots)
         qs = (
-            self.page_views.values("metadata__country")
+            page_views.values("metadata__country")
             .annotate(country_count=Count("metadata__country"))
             .order_by()
         )
@@ -81,9 +88,10 @@ class Domain(models.Model):
         data = self.get_data_in_percentages(data)
         return {"data": data, "colors": colors, "labels": labels}
 
-    def get_device_analytics(self):
+    def get_device_analytics(self, no_robots: bool = False) -> dict:
+        page_views = self.get_page_views(no_robots)
         qs = (
-            self.page_views.values("metadata__device")
+            page_views.values("metadata__device")
             .annotate(device_count=Count("metadata__device"))
             .order_by()
         )
@@ -93,9 +101,10 @@ class Domain(models.Model):
         data = self.get_data_in_percentages(data)
         return {"data": data, "colors": colors, "labels": labels}
 
-    def get_os_analytics(self):
+    def get_os_analytics(self, no_robots: bool = False) -> dict:
+        page_views = self.get_page_views(no_robots)
         qs = (
-            self.page_views.values("metadata__os")
+            page_views.values("metadata__os")
             .annotate(os_count=Count("metadata__os"))
             .order_by()
         )

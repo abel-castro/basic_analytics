@@ -94,15 +94,21 @@ class TestAddPageView:
 def test_n_plus_1(client, django_assert_max_num_queries):
     PageViewFactory.create_batch(10)
     test_domain = Domain.objects.first()
-    superuser = User.objects.create_user(username="superuser", password="Qwert1234", is_superuser=True)
+    superuser = User.objects.create_user(
+        username="superuser", password="Qwert1234", is_superuser=True
+    )
     client.force_login(superuser)
     with django_assert_max_num_queries(10):
-        response = client.get(reverse("domain_page_views", kwargs={"pk": test_domain.pk}))
+        response = client.get(
+            reverse("domain_page_views", kwargs={"pk": test_domain.pk})
+        )
         assert response.status_code == status.HTTP_200_OK
 
     PageViewFactory.create_batch(10)
     with django_assert_max_num_queries(10):
-        response = client.get(reverse("domain_page_views", kwargs={"pk": test_domain.pk}))
+        response = client.get(
+            reverse("domain_page_views", kwargs={"pk": test_domain.pk})
+        )
         assert response.status_code == status.HTTP_200_OK
 
 
@@ -110,4 +116,3 @@ def test_n_plus_1(client, django_assert_max_num_queries):
 def test_no_redirect_to_login_page(client):
     response = client.get(reverse("home_view"))
     assert response.status_code == status.HTTP_403_FORBIDDEN
-

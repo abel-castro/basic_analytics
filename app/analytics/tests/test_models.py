@@ -1,8 +1,10 @@
 import pytest
+from django.conf import settings
 from django.core.management import call_command
 from django.test import TestCase
 
 from analytics.models import Domain
+from analytics.tests.factories import DomainFactory, PageViewFactory
 
 
 class TestAnalytics(TestCase):
@@ -53,7 +55,7 @@ class TestAnalytics(TestCase):
             "2021-11",
             "2021-12",
         ]
-        page_views = self.test_domain.get_page_views()
+        page_views = self.test_domain.get_page_views_data()
 
         assert expected_months == page_views["months"]
         assert expected_data == page_views["data"]
@@ -93,3 +95,33 @@ class TestAnalytics(TestCase):
         assert device_analytics["colors"]
         assert expected_countries == device_analytics["labels"]
         assert expected_data == device_analytics["data"]
+
+
+class TestNoRobotsAnalytics:
+    pytestmark = pytest.mark.django_db
+
+    @pytest.mark.parametrize("browser", settings.ROBOT_BROWSERS)
+    def test__get_page_views__no_robots__browsers(self, browser):
+        domain = DomainFactory.create()
+        robot_metadata = {
+            "browser": browser,
+            "os": "Other",
+            "device": "Other",
+            "country": "Unknown",
+        }
+        PageViewFactory.create_batch(10, domain=domain, metadata=robot_metadata)
+        PageViewFactory.create_batch(10, domain=domain)
+        assert domain.get_page_views_data(no_robots=True)["data"] == [10]
+
+    @pytest.mark.parametrize("device", settings.ROBOT_DEVICES)
+    def test__get_page_views__no_robots__devices(self, device):
+        domain = DomainFactory.create()
+        robot_metadata = {
+            "browser": "Other",
+            "os": "Other",
+            "device": device,
+            "country": "Unknown",
+        }
+        PageViewFactory.create_batch(10, domain=domain, metadata=robot_metadata)
+        PageViewFactory.create_batch(10, domain=domain)
+        assert domain.get_page_views_data(no_robots=True)["data"] == [10]

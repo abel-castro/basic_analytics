@@ -6,6 +6,8 @@ It is possible to see:
 - Amount of page views for a domain and for the different paths of it
 - Browser, Country, Device and OS data
 
+![Basic Analytics](https://github.com/abel-castro/basic_analytics/blob/main/screenshot.png)
+
 ## API
 POST: `/api/track/`
 - required arguments:

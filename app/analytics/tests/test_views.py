@@ -1,5 +1,4 @@
 import pytest
-from django.core.cache import cache
 from django.contrib.auth.models import User
 from django.urls import reverse
 from rest_framework import status
@@ -132,6 +131,5 @@ def test_n_plus_1__home_page(client, django_assert_max_num_queries):
 
 @pytest.mark.django_db
 def test_no_redirect_to_login_page(client):
-    cache.clear()
     response = client.get(reverse("home_view"))
     assert response.status_code == status.HTTP_403_FORBIDDEN

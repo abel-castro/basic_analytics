@@ -26,35 +26,35 @@ from analytics.views import (DomainBrowserAnalytics, DomainCountryAnalytics,
 
 urlpatterns = [
     path(f"{settings.ADMIN_URL}/", admin.site.urls),
-    path("", cache_page(60 * 60)(HomeView.as_view()), name="home_view"),
+    path("", HomeView.as_view(), name="home_view"),
     path(
         "domain/<pk>/page-views",
-        cache_page(60 * 60)(DomainPageViews.as_view()),
+        DomainPageViews.as_view(),
         name="domain_page_views",
     ),
     path(
         "domain/<pk>/page-views-by-url",
-        cache_page(60 * 60)(DomainPageViewsByUrl.as_view()),
+        DomainPageViewsByUrl.as_view(),
         name="domain_page_views_by_url",
     ),
     path(
         "domain/<pk>/browser-analytics",
-        cache_page(60 * 60)(DomainBrowserAnalytics.as_view()),
+        DomainBrowserAnalytics.as_view(),
         name="domain_browser_analytics",
     ),
     path(
         "domain/<pk>/country-analytics",
-        cache_page(60 * 60)(DomainCountryAnalytics.as_view()),
+        DomainCountryAnalytics.as_view(),
         name="domain_country_analytics",
     ),
     path(
         "domain/<pk>/device-analytics",
-        cache_page(60 * 60)(DomainDeviceAnalytics.as_view()),
+        DomainDeviceAnalytics.as_view(),
         name="domain_device_analytics",
     ),
     path(
         "domain/<pk>/os-analytics",
-        cache_page(60 * 60)(DomainOSAnalytics.as_view()),
+        DomainOSAnalytics.as_view(),
         name="domain_os_analytics",
     ),
     path("api/track/", TrackView.as_view(), name="track_view"),

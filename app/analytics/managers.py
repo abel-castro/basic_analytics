@@ -3,8 +3,10 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from rest_framework.request import Request
 
-from analytics.helpers import (get_client_ip_from_request_meta,
-                               get_page_view_metadata_from_request_meta)
+from analytics.helpers import (
+    get_client_ip_from_request_meta,
+    get_page_view_metadata_from_request_meta,
+)
 
 
 class PageViewCreationError(Exception):

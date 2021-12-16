@@ -1,6 +1,7 @@
+from django.contrib.auth import logout
 from django.contrib.auth.mixins import AccessMixin
 from django.core.exceptions import PermissionDenied
-from django.views.generic import DetailView, ListView
+from django.views.generic import DetailView, ListView, RedirectView
 from django.views.generic.base import ContextMixin
 from rest_framework import status
 from rest_framework.response import Response
@@ -61,6 +62,16 @@ class PieAnalyticsMixin(DashboardPageMixin, DetailView):
         context["labels"] = analytics["labels"]
         context["data"] = analytics["data"]
         return context
+
+
+class LogoutView(RedirectView):
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            logout(request)
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_redirect_url(self, *args, **kwargs):
+        return settings.LOGIN_URL
 
 
 class HomeView(DashboardPageMixin, ListView):

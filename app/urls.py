@@ -17,16 +17,23 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path
-from django.views.decorators.cache import cache_page
 
-from analytics.views import (DomainBrowserAnalytics, DomainCountryAnalytics,
-                             DomainDeviceAnalytics, DomainOSAnalytics,
-                             DomainPageViews, DomainPageViewsByUrl, HomeView,
-                             TrackView)
+from analytics.views import (
+    DomainBrowserAnalytics,
+    DomainCountryAnalytics,
+    DomainDeviceAnalytics,
+    DomainOSAnalytics,
+    DomainPageViews,
+    DomainPageViewsByUrl,
+    HomeView,
+    LogoutView,
+    TrackView,
+)
 
 urlpatterns = [
     path(f"{settings.ADMIN_URL}/", admin.site.urls),
     path("", HomeView.as_view(), name="home_view"),
+    path("logout/", LogoutView.as_view(), name="logout_view"),
     path(
         "domain/<pk>/page-views",
         DomainPageViews.as_view(),

@@ -149,10 +149,4 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 GEOIP_PATH = os.path.join(BASE_DIR, "data")
 
 # Browsers and devices values that can be excluded from the charts
-ROBOT_BROWSERS = [
-    "AhrefsBot",
-    "SeznamBot",
-    "UptimeRobot",
-    "ZoominfoBot",
-]
-ROBOT_DEVICES = ["Spider"]
+EXCLUDED_DEVICES = ["Spider"]

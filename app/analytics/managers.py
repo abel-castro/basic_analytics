@@ -1,3 +1,5 @@
+import json
+
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -35,8 +37,8 @@ class PageViewManager(models.Manager):
         """
         return (
             self.get_queryset()
-            .exclude(metadata__device__in=settings.ROBOT_DEVICES)
-            .exclude(metadata__browser__in=settings.ROBOT_BROWSERS)
+            .exclude(metadata__device__in=settings.EXCLUDED_DEVICES)
+            .exclude(metadata__browser__icontains="bot")
         )
 
     def create_from_request(self, request: Request):

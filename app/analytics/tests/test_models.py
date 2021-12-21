@@ -103,7 +103,7 @@ class TestAnalytics(TestCase):
 class TestNoRobotsAnalytics:
     pytestmark = pytest.mark.django_db
 
-    @pytest.mark.parametrize("browser", settings.ROBOT_BROWSERS)
+    @pytest.mark.parametrize("browser", ["AhrefsBot", "UptimeRobot", "Imaginary bot"])
     def test__get_page_views__no_robots__browsers(self, browser):
         domain = DomainFactory.create()
         robot_metadata = {
@@ -116,7 +116,7 @@ class TestNoRobotsAnalytics:
         PageViewFactory.create_batch(10, domain=domain)
         assert domain.get_page_views_data(no_robots=True)["data"] == [10]
 
-    @pytest.mark.parametrize("device", settings.ROBOT_DEVICES)
+    @pytest.mark.parametrize("device", settings.EXCLUDED_DEVICES)
     def test__get_page_views__no_robots__devices(self, device):
         domain = DomainFactory.create()
         robot_metadata = {
@@ -136,7 +136,7 @@ def test_get_monthly_average_views():
     robot_metadata = {
         "browser": "Other",
         "os": "Other",
-        "device": settings.ROBOT_DEVICES[0],
+        "device": settings.EXCLUDED_DEVICES[0],
         "country": "Unknown",
     }
     PageViewFactory.create_batch(20, domain=domain, metadata=robot_metadata)

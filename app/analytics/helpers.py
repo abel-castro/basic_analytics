@@ -18,8 +18,8 @@ def get_country_from_request_meta(request_meta: dict) -> str:
     try:
         country = geo_ip.country_name(ip)
     except AddressNotFoundError:
-        country = "Unknown"
-    return country
+        country = None
+    return country or "Unknown"
 
 
 def get_page_view_metadata_from_request_meta(request_meta: dict) -> dict:

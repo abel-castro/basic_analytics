@@ -3,17 +3,13 @@
 
 {% block main_content %}
 {% include "includes/page_title.html" %}
-<h3 class="mb-4">Monthly average page views by domain</h3>
+<h3 class="mb-4">{{ object_list.count }} domains available</h3>
 <div class="row">
-{% for element in domain_monthly_average_views  %}
+{% for object in object_list  %}
     <div class="card-container  col-xs-12 col-sm-4 p-2">
          <div class="card">
           <div class="card-body">
-            <h5 class="card-title">{{ element.domain }}</h5>
-            <h6 class="card-subtitle mb-2 text-muted"> (no robots / with robots)</h6>
-            <p class="card-text">
-                <h6>{{ element.no_robots }} / <small class="text-muted">{{ element.with_robots }}</small></h6>
-            </p>
+            <h5 class="card-title"><a href="{% url "domain_page_views" pk=object.pk %}">{{ object.base_url }}</a></h5>
           </div>
         </div>
     </div>

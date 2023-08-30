@@ -84,13 +84,6 @@ class HomeView(DashboardPageMixin, ListView):
     def get_page_title(self) -> str:
         return "Dashboard"
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context[
-            "domain_monthly_average_views"
-        ] = Domain.objects.get_monthly_average_page_views()
-        return context
-
 
 class DomainPageViews(DashboardPageMixin, DetailView):
     template_name = "domain_page_views.html"

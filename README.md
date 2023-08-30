@@ -20,7 +20,7 @@ POST: `/api/track/`
 Get the GeoLite2-City and GeoLite2-Country files from https://dev.maxmind.com/ and put them in to the /app/data directory.
 
 ### Development
-- Create a .env file from the template env_template_dev with the desired values.
+- Create a .env file from the template env_template with the desired values.
 
 - Build the development image: ```docker-compose build ```
 
@@ -30,7 +30,7 @@ Get the GeoLite2-City and GeoLite2-Country files from https://dev.maxmind.com/ a
 to see your runserver.
 
 ### Production
-- Create a .env file from the template env_template_prd with the desired values.
+- Create a .env file from the template env_template with the desired values.
 
 - Build the production image:
 ```

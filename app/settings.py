@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     "django_extensions",
     "django_user_agents",
     "axes",
+    "debug_toolbar",
     # project apps
     "analytics",
 ]
@@ -65,6 +66,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "django_user_agents.middleware.UserAgentMiddleware",
     "axes.middleware.AxesMiddleware",
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
 ]
 
 ROOT_URLCONF = "urls"
@@ -137,6 +139,18 @@ USE_TZ = True
 
 ADMIN_URL = os.environ.get("ADMIN_URL", "admin")
 LOGIN_URL = f"/{ADMIN_URL}/login"
+
+
+# django-debug-toolbar
+if DEBUG:
+    import socket  # only if you haven't already imported this
+
+    hostname, _, ips = socket.gethostbyname_ex(socket.gethostname())
+    INTERNAL_IPS = [ip[: ip.rfind(".")] + ".1" for ip in ips] + [
+        "127.0.0.1",
+        "10.0.2.2",
+    ]
+
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/

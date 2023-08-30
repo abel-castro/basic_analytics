@@ -29,7 +29,6 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-
         clean = options["clean"]
         random_values = options["random_values"]
         if clean:

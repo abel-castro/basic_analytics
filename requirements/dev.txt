@@ -6,4 +6,3 @@ black
 isort
 freezegun
 pytest-freezegun
-django-debug-toolbar

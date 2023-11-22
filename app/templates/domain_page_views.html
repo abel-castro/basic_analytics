@@ -5,6 +5,9 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 {% include "includes/page_title.html" %}
+{% include "includes/date_filters.html" %}
+
+<p class="average-views">⌀ {{ average_views_with_robots}} / {{ average_views_no_robots }}</p>
 
 <canvas id="line-chart" width="800" height="450"></canvas>
 

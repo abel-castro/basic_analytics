@@ -1,10 +1,9 @@
 import pytest
+from analytics.models import Domain
+from analytics.tests.factories import DomainFactory, PageViewFactory
 from django.conf import settings
 from django.core.management import call_command
 from django.test import TestCase
-
-from analytics.models import Domain
-from analytics.tests.factories import DomainFactory, PageViewFactory
 
 
 class TestAnalytics(TestCase):
@@ -30,35 +29,47 @@ class TestAnalytics(TestCase):
             24,
         ] * 2
         expected_months = [
-            "2020-01",
-            "2020-02",
-            "2020-03",
-            "2020-04",
-            "2020-05",
-            "2020-06",
-            "2020-07",
-            "2020-08",
-            "2020-09",
-            "2020-10",
-            "2020-11",
-            "2020-12",
-            "2021-01",
-            "2021-02",
-            "2021-03",
-            "2021-04",
-            "2021-05",
-            "2021-06",
-            "2021-07",
-            "2021-08",
-            "2021-09",
-            "2021-10",
-            "2021-11",
-            "2021-12",
+            "2022-01",
+            "2022-02",
+            "2022-03",
+            "2022-04",
+            "2022-05",
+            "2022-06",
+            "2022-07",
+            "2022-08",
+            "2022-09",
+            "2022-10",
+            "2022-11",
+            "2022-12",
+            "2023-01",
+            "2023-02",
+            "2023-03",
+            "2023-04",
+            "2023-05",
+            "2023-06",
+            "2023-07",
+            "2023-08",
+            "2023-09",
+            "2023-10",
+            "2023-11",
+            "2023-12",
         ]
         page_views = self.test_domain.get_page_views_data()
 
         assert expected_months == page_views["months"]
         assert expected_data == page_views["data"]
+
+    @pytest.mark.freeze_time("2023-12-30")
+    def test__domain_get_page_views__last_3_months(self):
+        expected_months = [
+            "2023-10",
+            "2023-11",
+            "2023-12",
+        ]
+
+        page_views = self.test_domain.get_page_views_data(period="3")
+
+        assert expected_months == page_views["months"]
 
     def test__domain_country_analytics(self):
         expected_countries = ["AT"]
@@ -104,7 +115,7 @@ class TestNoRobotsAnalytics:
     pytestmark = pytest.mark.django_db
 
     @pytest.mark.parametrize("browser", ["AhrefsBot", "UptimeRobot", "Imaginary bot"])
-    def test__get_page_views__no_robots__browsers(self, browser):
+    def test__get_page_views__with_robots__browsers(self, browser):
         domain = DomainFactory.create()
         robot_metadata = {
             "browser": browser,
@@ -114,10 +125,11 @@ class TestNoRobotsAnalytics:
         }
         PageViewFactory.create_batch(10, domain=domain, metadata=robot_metadata)
         PageViewFactory.create_batch(10, domain=domain)
-        assert domain.get_page_views_data(no_robots=True)["data"] == [10]
+        assert domain.get_page_views_data(with_robots=True)["data"] == [20]
+        assert domain.get_page_views_data(with_robots=False)["data"] == [10]
 
     @pytest.mark.parametrize("device", settings.EXCLUDED_DEVICES)
-    def test__get_page_views__no_robots__devices(self, device):
+    def test__get_page_views__with_robots__devices(self, device):
         domain = DomainFactory.create()
         robot_metadata = {
             "browser": "Other",
@@ -127,7 +139,8 @@ class TestNoRobotsAnalytics:
         }
         PageViewFactory.create_batch(10, domain=domain, metadata=robot_metadata)
         PageViewFactory.create_batch(10, domain=domain)
-        assert domain.get_page_views_data(no_robots=True)["data"] == [10]
+        assert domain.get_page_views_data(with_robots=True)["data"] == [20]
+        assert domain.get_page_views_data(with_robots=False)["data"] == [10]
 
 
 @pytest.mark.django_db
@@ -141,8 +154,8 @@ def test_get_monthly_average_views():
     }
     PageViewFactory.create_batch(20, domain=domain, metadata=robot_metadata)
     PageViewFactory.create_batch(10, domain=domain)
-    assert domain.get_monthly_average_page_views() == 30
-    assert domain.get_monthly_average_page_views(no_robots=True) == 10
+    assert domain.get_monthly_average_page_views(with_robots=True) == 30
+    assert domain.get_monthly_average_page_views(with_robots=False) == 10
 
 
 @pytest.mark.django_db

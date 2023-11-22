@@ -1,16 +1,11 @@
 import random
 
+from analytics.models import Domain
+from analytics.tests.factories import (TEST_BROWSERS, TEST_DEVICES,
+                                       TEST_METADATA, DomainFactory,
+                                       PageViewFactory)
 from django.core.management.base import BaseCommand
 from freezegun import freeze_time
-
-from analytics.models import Domain
-from analytics.tests.factories import (
-    TEST_BROWSERS,
-    TEST_DEVICES,
-    TEST_METADATA,
-    DomainFactory,
-    PageViewFactory,
-)
 
 
 class Command(BaseCommand):
@@ -46,13 +41,13 @@ class Command(BaseCommand):
                     "device": random.choice(TEST_DEVICES),
                     "country": "AT",
                 }
-            with freeze_time(f"2020-{str(i)}-1"):
+            with freeze_time(f"2022-{str(i)}-1"):
                 page_views = PageViewFactory.create_batch(
                     i * 2, domain=domain, metadata=metadata
                 )
                 amount_page_views += len(page_views)
 
-            with freeze_time(f"2021-{str(i)}-1"):
+            with freeze_time(f"2023-{str(i)}-1"):
                 page_views = PageViewFactory.create_batch(
                     i * 2, domain=domain, metadata=metadata
                 )

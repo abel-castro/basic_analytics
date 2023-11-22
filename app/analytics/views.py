@@ -1,15 +1,17 @@
+from typing import Any
+
+import settings
+from analytics.managers import PageViewCreationError
+from analytics.models import Domain, PageView
 from django.contrib.auth import logout
 from django.contrib.auth.mixins import AccessMixin
 from django.core.exceptions import PermissionDenied
+from django.db.models import QuerySet
 from django.views.generic import DetailView, ListView, RedirectView
 from django.views.generic.base import ContextMixin
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
-import settings
-from analytics.managers import PageViewCreationError
-from analytics.models import Domain, PageView
 
 
 class CustomLoginRequiredMixin(AccessMixin):
@@ -27,22 +29,23 @@ class CustomLoginRequiredMixin(AccessMixin):
 class DashboardPageMixin(CustomLoginRequiredMixin, ContextMixin):
     page_title = ""
 
-    def get_no_robots_value(self) -> bool:
+    def get_with_robots_value(self) -> bool:
         """
         Return if robots data should be displayed or not.
 
-        This will be defined by passing the query parameter '?no_robots=true'
-        Only if '?no_robots=true' no robot data will be returned.
+        This will be defined by passing the query parameter '?with_robots=true'
+        Only if '?with_robots=true' no robot data will be returned.
         """
-        return self.request.GET.get("no_robots") == "true"
+        return self.request.GET.get("with_robots") in ["true", "True"]
 
     def get_page_title(self) -> str:
         return f"{self.page_title} for {self.get_object()}"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        self.period = self.request.GET.get("period")
         context["page_title"] = self.get_page_title()
-        context["is_robots_page"] = not self.get_no_robots_value()
+        context["is_robots_page"] = self.get_with_robots_value()
         context["domains"] = Domain.objects.only("id", "base_url")
         context["django_admin_url"] = settings.ADMIN_URL
         return context
@@ -56,7 +59,7 @@ class PieAnalyticsMixin(DashboardPageMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         analytics = getattr(self.get_object(), self.get_data_function)(
-            self.get_no_robots_value()
+            with_robots=self.get_with_robots_value()
         )
         context["colors"] = analytics["colors"]
         context["labels"] = analytics["labels"]
@@ -78,8 +81,8 @@ class HomeView(DashboardPageMixin, ListView):
     template_name = "home.html"
     model = Domain
 
-    def get_no_robots_value(self) -> bool:
-        return True
+    def get_with_robots_value(self) -> bool:
+        return False
 
     def get_page_title(self) -> str:
         return "Dashboard"
@@ -92,7 +95,11 @@ class DomainPageViews(DashboardPageMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        page_views = self.get_object().get_page_views_data(self.get_no_robots_value())
+        page_views = self.get_object().get_page_views_data(
+            period=self.period, with_robots=self.get_with_robots_value()
+        )
+        context["average_views_with_robots"] = self.get_object().get_monthly_average_page_views(with_robots=True)
+        context["average_views_no_robots"] = self.get_object().get_monthly_average_page_views(with_robots=False)
         context["data"] = page_views["data"]
         context["months"] = page_views["months"]
         return context
@@ -106,7 +113,7 @@ class DomainPageViewsByUrl(DashboardPageMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         page_views_by_url = self.get_object().get_page_views_by_url(
-            self.get_no_robots_value()
+            period=self.period, with_robots=self.get_with_robots_value()
         )
         context["data"] = page_views_by_url
         return context

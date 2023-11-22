@@ -1,4 +1,7 @@
+from typing import Optional
+
 from django.contrib.gis.geoip2 import GeoIP2
+from django.utils import timezone
 from geoip2.errors import AddressNotFoundError
 from user_agents import parse
 
@@ -32,3 +35,18 @@ def get_page_view_metadata_from_request_meta(request_meta: dict) -> dict:
         metadata["device"] = user_agent.device.family
         metadata["country"] = get_country_from_request_meta(request_meta)
     return metadata
+
+
+def transform_period_string_to_timedelta(period: str) -> Optional[timezone.timedelta]:
+    result = None
+
+    if period == "1":
+        result = timezone.timedelta(days=30)
+    elif period == "3":
+        result = timezone.timedelta(days=90)
+    elif period == "6":
+        result = timezone.timedelta(days=180)
+    elif period == "12":
+        result = timezone.timedelta(days=365)
+
+    return result

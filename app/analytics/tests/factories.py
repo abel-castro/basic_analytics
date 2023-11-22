@@ -1,7 +1,6 @@
 import random
 
 import factory
-
 from analytics.models import Domain, PageView
 
 

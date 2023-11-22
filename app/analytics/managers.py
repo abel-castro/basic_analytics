@@ -1,14 +1,11 @@
 import json
 
+from analytics.helpers import (get_client_ip_from_request_meta,
+                               get_page_view_metadata_from_request_meta)
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 from rest_framework.request import Request
-
-from analytics.helpers import (
-    get_client_ip_from_request_meta,
-    get_page_view_metadata_from_request_meta,
-)
 
 
 class PageViewCreationError(Exception):
@@ -23,24 +20,14 @@ class DomainManager(models.Manager):
         for domain in self.model.objects.all().prefetch_related("page_views"):
             data = {
                 "domain": domain.base_url,
-                "with_robots": domain.get_monthly_average_page_views(),
-                "no_robots": domain.get_monthly_average_page_views(no_robots=True),
+                "with_robots": domain.get_monthly_average_page_views(with_robots=True),
+                "no_robots": domain.get_monthly_average_page_views(with_robots=False),
             }
             monthly_average_page_views.append(data)
         return monthly_average_page_views
 
 
 class PageViewManager(models.Manager):
-    def without_robots(self):
-        """
-        Exclude robot generated page views from the queryset.
-        """
-        return (
-            self.get_queryset()
-            .exclude(metadata__device__in=settings.EXCLUDED_DEVICES)
-            .exclude(metadata__browser__icontains="bot")
-        )
-
     def create_from_request(self, request: Request):
         from analytics.models import Domain
 

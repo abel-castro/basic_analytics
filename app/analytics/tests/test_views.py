@@ -1,10 +1,9 @@
 import pytest
+from analytics.models import Domain, PageView
+from analytics.tests.factories import DomainFactory, PageViewFactory
 from django.contrib.auth.models import User
 from django.urls import reverse
 from rest_framework import status
-
-from analytics.models import Domain, PageView
-from analytics.tests.factories import DomainFactory, PageViewFactory
 
 TEST_REQUEST_META = {
     "wsgi.url_scheme": "http",

@@ -32,7 +32,7 @@ class Command(BaseCommand):
         amount_page_views = 0
         domain = DomainFactory.create()
 
-        for i in range(1, 12 + 1):
+        for i in range(1, 100):
             metadata = TEST_METADATA
             if random_values:
                 metadata = {
@@ -41,15 +41,22 @@ class Command(BaseCommand):
                     "device": random.choice(TEST_DEVICES),
                     "country": "AT",
                 }
-            with freeze_time(f"2022-{str(i)}-1"):
+                month = random.randint(1, 12)
+                day = (
+                    random.randint(1, 28)
+                    if month == 2
+                    else random.randint(1, 30 if month in [4, 6, 9, 11] else 31)
+                )
+
+            with freeze_time(f"2022-{month}-{day}"):
                 page_views = PageViewFactory.create_batch(
-                    i * 2, domain=domain, metadata=metadata
+                    random.randint(1, 100), domain=domain, metadata=metadata
                 )
                 amount_page_views += len(page_views)
 
-            with freeze_time(f"2023-{str(i)}-1"):
+            with freeze_time(f"2023-{month}-{day}"):
                 page_views = PageViewFactory.create_batch(
-                    i * 2, domain=domain, metadata=metadata
+                    random.randint(1, 100), domain=domain, metadata=metadata
                 )
                 amount_page_views += len(page_views)
 

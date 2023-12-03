@@ -146,7 +146,7 @@ class DomainPageViewsByUrlElement(DashboardPageMixin, ListView):
             domain_pk=domain_pk, url=url, with_robots=self.get_with_robots_value()
         )
         context["data"] = page_views["data"]
-        context["months"] = page_views["months"]
+        context["days"] = page_views["days"]
         return context
 
 

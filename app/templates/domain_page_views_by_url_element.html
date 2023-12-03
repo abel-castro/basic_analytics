@@ -13,7 +13,7 @@
     new Chart(document.getElementById("line-chart"), {
         type: 'line',
         data: {
-            labels: {{ months | safe }},
+            labels: {{ days | safe }},
             datasets: [
                 {
                 label: "Page views",
@@ -33,9 +33,9 @@
                     type: 'time',
                     time: {
                         displayFormats: {
-                            'day': 'YYYY-MM'
+                            'day': 'YYYY-MM-DD'
                         },
-                        unit: 'month',
+                        unit: 'day',
                     }
                 }]
             }

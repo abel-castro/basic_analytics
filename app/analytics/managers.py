@@ -7,7 +7,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Count, F, Func, Value
-from django.db.models.functions import TruncMonth
+from django.db.models.functions import TruncDay
 from rest_framework.request import Request
 
 
@@ -34,21 +34,21 @@ class PageViewManager(models.Manager):
     def get_views_for_url(self, domain_pk: str, url: str, with_robots: bool) -> Dict:
         page_views = self.model.objects.filter(domain__pk=domain_pk, url=url)
         qs = (
-            page_views.annotate(evaluation_month=TruncMonth("timestamp"))
-            .values("evaluation_month")
+            page_views.annotate(day_with_views=TruncDay("timestamp"))
+            .values("day_with_views")
             .annotate(Count("pk", distinct=True))
-        ).order_by("evaluation_month")
+        ).order_by("day_with_views")
         qs = qs.annotate(
-            iso_evaluation_month=Func(
-                F("evaluation_month"),
-                Value("YYYY-MM"),
+            day_with_views_iso_format=Func(
+                F("day_with_views"),
+                Value("YYYY-MM-DD"),
                 function="to_char",
                 output_field=models.CharField(),
             )
         )
-        months = list(qs.values_list("iso_evaluation_month", flat=True))
+        days = list(qs.values_list("day_with_views_iso_format", flat=True))
         data = list(qs.values_list("pk__count", flat=True))
-        return {"data": data, "months": months}
+        return {"data": data, "days": days}
 
     def create_from_request(self, request: Request):
         from analytics.models import Domain

@@ -15,8 +15,9 @@ Including another URLconf
 """
 from analytics.views import (DomainBrowserAnalytics, DomainCountryAnalytics,
                              DomainDeviceAnalytics, DomainOSAnalytics,
-                             DomainPageViews, DomainPageViewsByUrl, HomeView,
-                             LogoutView, TrackView)
+                             DomainPageViews, DomainPageViewsByUrl,
+                             DomainPageViewsByUrlElement, HomeView, LogoutView,
+                             TrackView)
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
@@ -36,6 +37,11 @@ urlpatterns = [
         "domain/<pk>/page-views-by-url",
         DomainPageViewsByUrl.as_view(),
         name="domain_page_views_by_url",
+    ),
+    path(
+        "domain/<uuid:pk>/page-views-by-url/<path:url>/",
+        DomainPageViewsByUrlElement.as_view(),
+        name="domain_page_views_by_url_element",
     ),
     path(
         "domain/<pk>/browser-analytics",

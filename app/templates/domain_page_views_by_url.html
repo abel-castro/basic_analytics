@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load full_url_encode %}
 
 {% block main_content %}
 {% include "includes/page_title.html" %}
@@ -8,10 +9,12 @@
 <div class="col-md-6 col-12">
     <ul class="list-group">
     {% for entry in data %}
+        {% with entry.url|full_url_encode as encoded_url %}
         <li class="list-group-item d-flex justify-content-between align-items-center">
-            {{ entry.url }}
+            <a href="/domain/{{ pk }}/page-views-by-url/{{ encoded_url }}?with_robots={{ is_robots_page }}">{{ entry.url }}</a>
               <span class="badge bg-primary rounded-pill">{{ entry.count }}</span>
         </li>
+        {% endwith %}
     {% endfor %}
     </ul>
 </div>

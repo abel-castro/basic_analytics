@@ -1,4 +1,5 @@
 from typing import Any
+from urllib.parse import unquote
 
 import settings
 from analytics.managers import PageViewCreationError
@@ -98,8 +99,12 @@ class DomainPageViews(DashboardPageMixin, DetailView):
         page_views = self.get_object().get_page_views_data(
             period=self.period, with_robots=self.get_with_robots_value()
         )
-        context["average_views_with_robots"] = self.get_object().get_monthly_average_page_views(with_robots=True)
-        context["average_views_no_robots"] = self.get_object().get_monthly_average_page_views(with_robots=False)
+        context[
+            "average_views_with_robots"
+        ] = self.get_object().get_monthly_average_page_views(with_robots=True)
+        context[
+            "average_views_no_robots"
+        ] = self.get_object().get_monthly_average_page_views(with_robots=False)
         context["data"] = page_views["data"]
         context["months"] = page_views["months"]
         return context
@@ -115,7 +120,33 @@ class DomainPageViewsByUrl(DashboardPageMixin, DetailView):
         page_views_by_url = self.get_object().get_page_views_by_url(
             period=self.period, with_robots=self.get_with_robots_value()
         )
+        context["pk"] = self.kwargs.get("pk")
         context["data"] = page_views_by_url
+        return context
+
+
+class DomainPageViewsByUrlElement(DashboardPageMixin, ListView):
+    template_name = "domain_page_views_by_url_element.html"
+    model = PageView
+
+    def get_queryset(self):
+        pk = self.kwargs.get("pk")
+        url = unquote(self.kwargs.get("url"))
+        return self.model.objects.filter(domain__pk=pk, url=url).order_by("timestamp")
+
+    def get_page_title(self) -> str:
+        return f"Page views for the url '{self.kwargs.get('url')}'"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        domain_pk = self.kwargs.get("pk")
+        url = unquote(self.kwargs.get("url"))
+
+        page_views = PageView.objects.get_views_for_url(
+            domain_pk=domain_pk, url=url, with_robots=self.get_with_robots_value()
+        )
+        context["data"] = page_views["data"]
+        context["months"] = page_views["months"]
         return context
 
 

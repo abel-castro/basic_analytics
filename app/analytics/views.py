@@ -135,7 +135,7 @@ class DomainPageViewsByUrlElement(DashboardPageMixin, ListView):
         return self.model.objects.filter(domain__pk=pk, url=url).order_by("timestamp")
 
     def get_page_title(self) -> str:
-        return f"Page views for the url '{self.kwargs.get('url')}'"
+        return f"Page views for the url '{self.kwargs.get('url')}/'"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

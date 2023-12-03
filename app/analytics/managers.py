@@ -32,7 +32,16 @@ class DomainManager(models.Manager):
 
 class PageViewManager(models.Manager):
     def get_views_for_url(self, domain_pk: str, url: str, with_robots: bool) -> Dict:
-        page_views = self.model.objects.filter(domain__pk=domain_pk, url=url)
+        if not url.endswith('/'):
+            url += '/'
+
+        page_views = self.model.objects.filter(domain__pk=domain_pk, url__contains=url)
+        
+        if not with_robots:
+            page_views = page_views.exclude(
+                metadata__device__in=settings.EXCLUDED_DEVICES
+            ).exclude(metadata__browser__icontains="bot")
+
         qs = (
             page_views.annotate(day_with_views=TruncDay("timestamp"))
             .values("day_with_views")

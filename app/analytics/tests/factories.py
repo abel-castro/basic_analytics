@@ -39,7 +39,7 @@ class PageViewFactory(factory.django.DjangoModelFactory):
     @factory.lazy_attribute
     def url(self):
         uri_path = random.choice(TEST_URI_PATHS)
-        return f"{self.domain.base_url}{uri_path}"
+        return f"{self.domain.base_url}{uri_path}/"
 
     @factory.lazy_attribute
     def metadata(self):

@@ -1,9 +1,13 @@
 import random
 
 from analytics.models import Domain
-from analytics.tests.factories import (TEST_BROWSERS, TEST_DEVICES,
-                                       TEST_METADATA, DomainFactory,
-                                       PageViewFactory)
+from analytics.tests.factories import (
+    TEST_BROWSERS,
+    TEST_DEVICES,
+    TEST_METADATA,
+    DomainFactory,
+    PageViewFactory,
+)
 from django.core.management.base import BaseCommand
 from freezegun import freeze_time
 

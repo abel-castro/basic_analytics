@@ -1,10 +1,13 @@
 import json
+from typing import Dict
 
 from analytics.helpers import (get_client_ip_from_request_meta,
                                get_page_view_metadata_from_request_meta)
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.db.models import Count, F, Func, Value
+from django.db.models.functions import TruncDay
 from rest_framework.request import Request
 
 
@@ -28,6 +31,25 @@ class DomainManager(models.Manager):
 
 
 class PageViewManager(models.Manager):
+    def get_views_for_url(self, domain_pk: str, url: str, with_robots: bool) -> Dict:
+        page_views = self.model.objects.filter(domain__pk=domain_pk, url=url)
+        qs = (
+            page_views.annotate(day_with_views=TruncDay("timestamp"))
+            .values("day_with_views")
+            .annotate(Count("pk", distinct=True))
+        ).order_by("day_with_views")
+        qs = qs.annotate(
+            day_with_views_iso_format=Func(
+                F("day_with_views"),
+                Value("YYYY-MM-DD"),
+                function="to_char",
+                output_field=models.CharField(),
+            )
+        )
+        days = list(qs.values_list("day_with_views_iso_format", flat=True))
+        data = list(qs.values_list("pk__count", flat=True))
+        return {"data": data, "days": days}
+
     def create_from_request(self, request: Request):
         from analytics.models import Domain
 
